@@ -1,3 +1,4 @@
+# venv_prj\Scripts\activate
 '''
 Sound classification using YAMNet.
 '''
@@ -5,6 +6,8 @@ import tensorflow as tf
 import tensorflow_hub as hub
 import numpy as np
 import csv
+import os
+import pandas
 
 import matplotlib.pyplot as plt
 from IPython.display import Audio
@@ -37,38 +40,55 @@ def ensure_sample_rate(original_sample_rate, waveform,
     waveform = scipy.signal.resample(waveform, desired_length)
   return desired_sample_rate, waveform
 
-# wav_file_name = 'speech_whistling2.wav'
-wav_file_name = 'music/floating-abstract-142819.wav'
-sample_rate, wav_data = wavfile.read(wav_file_name, 'rb')
-# Convert to mono
-if len(wav_data.shape) > 1:
-    wav_data = np.mean(wav_data, axis=1)
-sample_rate, wav_data = ensure_sample_rate(sample_rate, wav_data)
+datas = []
+wav_folder = 'music/'
+# Find all wav files in folder
+for wav_file_name in os.listdir(wav_folder):
+    if not wav_file_name.endswith('.wav'):
+        continue
+    print(f'Processing {wav_folder}{wav_file_name}...')
+    sample_rate, wav_data = wavfile.read(wav_folder + wav_file_name, 'rb')
+    # Convert to mono
+    if len(wav_data.shape) > 1:
+        wav_data = np.mean(wav_data, axis=1)
+    sample_rate, wav_data = ensure_sample_rate(sample_rate, wav_data)
 
-# Show some basic information about the audio.
-duration = len(wav_data)/sample_rate
-print(f'Sample rate: {sample_rate} Hz')
-print(f'Total duration: {duration:.2f}s')
-print(f'Size of the input: {len(wav_data)}')
+    # Show some basic information about the audio.
+    duration = len(wav_data)/sample_rate
+    print(f'Sample rate: {sample_rate} Hz')
+    print(f'Total duration: {duration:.2f}s')
+    print(f'Size of the input: {len(wav_data)}')
 
-# Listening to the wav file.
-Audio(wav_data, rate=sample_rate)
+    # Listening to the wav file.
+    Audio(wav_data, rate=sample_rate)
 
-waveform = wav_data / tf.int16.max
+    waveform = wav_data / tf.int16.max
 
-# Run the model, check the output.
-scores, embeddings, spectrogram = model(waveform)
+    # Run the model, check the output.
+    scores, embeddings, spectrogram = model(waveform)
 
-scores_np = scores.numpy()
-spectrogram_np = spectrogram.numpy()
-infered_class = class_names[scores_np.mean(axis=0).argmax()]
-print(f'The main sound is: {infered_class}')
-mean_scores = np.mean(scores, axis=0)
-top_n = 4
-top_class_indices = np.argsort(mean_scores)[::-1][:top_n]
-sub_class = [class_names[x] for x in top_class_indices][1:top_n]
-print(f'Sub-class: {sub_class}')
+    scores_np = scores.numpy()
+    spectrogram_np = spectrogram.numpy()
+    infered_class = class_names[scores_np.mean(axis=0).argmax()]
+    print(f'The main sound is: {infered_class}')
+    mean_scores = np.mean(scores, axis=0)
+    top_n = 4
+    top_class_indices = np.argsort(mean_scores)[::-1][:top_n]
+    sub_class = [class_names[x] for x in top_class_indices][1:top_n]
+    print(f'Sub-class: {sub_class}')
+    print('------------------')
 
+    datas.append({
+        'file_path': wav_folder + wav_file_name,
+        'main_class': infered_class,
+        'sub_class': sub_class
+    })
+
+df = pandas.DataFrame(datas)
+df.to_csv('music.csv', index=False)
+
+
+'''
 plt.figure(figsize=(10, 6))
 
 # Plot the waveform.
@@ -96,3 +116,4 @@ yticks = range(0, top_n, 1)
 plt.yticks(yticks, [class_names[top_class_indices[x]] for x in yticks])
 _ = plt.ylim(-0.5 + np.array([top_n, 0]))
 plt.show()
+'''
