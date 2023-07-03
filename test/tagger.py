@@ -64,9 +64,10 @@ spectrogram_np = spectrogram.numpy()
 infered_class = class_names[scores_np.mean(axis=0).argmax()]
 print(f'The main sound is: {infered_class}')
 mean_scores = np.mean(scores, axis=0)
-top_n = 10
+top_n = 4
 top_class_indices = np.argsort(mean_scores)[::-1][:top_n]
-print(f'Sub-class: {[class_names[top_class_indices[x]] for x in range(4)]}')
+sub_class = [class_names[x] for x in top_class_indices][1:top_n]
+print(f'Sub-class: {sub_class}')
 
 plt.figure(figsize=(10, 6))
 
