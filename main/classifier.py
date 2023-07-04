@@ -8,7 +8,6 @@ import csv
 import os
 import pandas
 
-import matplotlib.pyplot as plt
 from IPython.display import Audio
 from scipy.io import wavfile
 import scipy.signal
