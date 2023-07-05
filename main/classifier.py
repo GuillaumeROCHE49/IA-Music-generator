@@ -40,6 +40,7 @@ class Classifier:
         class_map_path = self.model.class_map_path().numpy()
         self.class_names = class_names_from_csv(class_map_path)
         self.datas = []
+        self.spectrogram = []
     
     def get_class_names(self) -> list:
         """Returns list of class names corresponding to score vector."""
@@ -70,7 +71,8 @@ class Classifier:
         waveform = wav_data / tf.int16.max
 
         # Run the model, check the output.
-        scores, _, _ = self.model(waveform)
+        scores, _, spectrogram = self.model(waveform)
+        spectrogram = spectrogram.numpy() # type: np.ndarray
 
         scores_np = scores.numpy()
         infered_class = self.class_names[scores_np.mean(axis=0).argmax()]
@@ -81,9 +83,11 @@ class Classifier:
         sub_class = [self.class_names[x] for x in top_class_indices][1:top_n]
 
         self.datas.append({
+            'name': os.path.basename(wav_file_path).split('.')[0], # 'music/ambient-classical-guitar-144998.wav' -> 'ambient-classical-guitar-144998
             'file_path': wav_file_path,
             'main_class': infered_class,
-            'sub_class': sub_class
+            'sub_class': sub_class,
+            'spectrogram': spectrogram
         })
     
     def get_datas(self) -> list:
@@ -95,7 +99,14 @@ class Classifier:
         df = pandas.DataFrame(self.datas)
         df.to_csv(csv_file_path, index=False)
 
+    def __str__(self) -> str:
+        """ Get string representation of the classifier. """
+        string = ""
+        for data in self.datas:
+            string += f'{data["file_path"]}:\n\t{data["main_class"]}\n\t{data["sub_class"]}\n\n'
+        return string
+
 if __name__ == '__main__':
     classifier = Classifier()
     classifier.classify('music')
-    print(classifier.get_datas())
+    print(classifier)

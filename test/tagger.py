@@ -88,7 +88,6 @@ df = pandas.DataFrame(datas)
 df.to_csv('music.csv', index=False)
 
 
-'''
 plt.figure(figsize=(10, 6))
 
 # Plot the waveform.
@@ -116,4 +115,3 @@ yticks = range(0, top_n, 1)
 plt.yticks(yticks, [class_names[top_class_indices[x]] for x in yticks])
 _ = plt.ylim(-0.5 + np.array([top_n, 0]))
 plt.show()
-'''
