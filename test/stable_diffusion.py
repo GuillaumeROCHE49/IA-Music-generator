@@ -5,8 +5,9 @@ model = keras_cv.models.StableDiffusion(img_width=512, img_height=512) # Le mode
 diffusion_model = model.diffusion_model  # Le modèle de stable diffusion
 
 images = model.text_to_image("A spectrogram of a sad hard rock music",
-                             batch_size=1, num_steps=10) # type: list
+                             batch_size=1, num_steps=5) # type: list
 
+print(type(images[0]))
 
 def plot_images(images: list):
     plt.figure(figsize=(20, 20))

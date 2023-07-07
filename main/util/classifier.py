@@ -108,5 +108,5 @@ class Classifier:
 
 if __name__ == '__main__':
     classifier = Classifier()
-    classifier.classify('music')
+    classifier.classify('test_music')
     print(classifier)
