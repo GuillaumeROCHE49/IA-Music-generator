@@ -2,7 +2,11 @@ from custom_riffusion import riffusion
 from custom_riffusion.spectrogram.spectrogram_params import SpectrogramParams
 from util.classifier import Classifier
 
-prompt = "techno DJ and a country fiddle"
+import torch
+
+prompt = "a dark blues with drum"
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"Using device: {device}")
 
 # Generate music using Riffusion (https://github.com/riffusion/riffusion)
 img = riffusion.run_txt2img(
@@ -14,7 +18,7 @@ img = riffusion.run_txt2img(
     width=512,
     height=512,
     checkpoint="riffusion/riffusion-model-v1",
-    device="cpu",
+    device=device,
     scheduler="DPMSolverMultistepScheduler"
 )
 audio = riffusion.audio_segment_from_spectrogram_image(
@@ -34,10 +38,11 @@ audio = riffusion.audio_segment_from_spectrogram_image(
         num_griffin_lim_iters=32,
         power_for_image=0.25,
     ),
-    device="cpu"
+    device=device
 )
 # Save music to file
 audio.export("output.wav", format="wav")
 # Classify music using YAMNet
 classifier = Classifier()
-print(classifier.classify_single("output.wav"))
+classifier.classify_single("output.wav")
+print(classifier)

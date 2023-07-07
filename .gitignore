@@ -1,1 +1,9 @@
-venv_prj/*
+midi_files/
+venv-prj/
+.vscode/
+
+*.pyc
+*.pyo
+*.pyd
+
+*.h5
