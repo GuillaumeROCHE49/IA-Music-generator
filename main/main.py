@@ -4,8 +4,9 @@ from util.classifier import Classifier
 
 import torch
 import openai
+import json
 
-openai.api_key = 'xxxxx'
+openai.api_key = json.load(open("conf.json"))['openai_api_key']
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using device: {device}")
