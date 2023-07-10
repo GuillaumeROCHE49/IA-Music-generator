@@ -78,7 +78,7 @@ class Classifier:
         infered_class = self.class_names[scores_np.mean(axis=0).argmax()]
 
         mean_scores = np.mean(scores, axis=0)
-        top_n = 4
+        top_n = 6
         top_class_indices = np.argsort(mean_scores)[::-1][:top_n]
         sub_class = [self.class_names[x] for x in top_class_indices][1:top_n]
 
@@ -90,7 +90,7 @@ class Classifier:
             'spectrogram': spectrogram
         })
     
-    def get_datas(self) -> list:
+    def get_datas(self) -> list[dict]:
         """ Get all datas. """
         return self.datas
 
