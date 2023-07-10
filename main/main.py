@@ -5,7 +5,7 @@ from util.classifier import Classifier
 import torch
 import openai
 
-openai.api_key = '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'
+openai.api_key = 'xxxxx'
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using device: {device}")
